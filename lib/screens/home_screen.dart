@@ -25,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Lesson>> _lessonsFuture;
   final dbHelper = DBHelper();
   final DateFormat _dayFormat = DateFormat('dd.MM');
+  //final DateFormat _fullDateFormat = DateFormat('dd.MM.yyyy');
 
   @override
   void initState() {
@@ -108,12 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${formatter.format(_currentWeekStart)} – ${formatter.format(weekEnd)}',
-        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: _prevWeek,
+        ),
+        title: Text(
+          '${formatter.format(_currentWeekStart)} – ${formatter.format(weekEnd)}',
         ),
         actions: [
           IconButton(
@@ -164,11 +165,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LessonDetailScreen(
+                            builder: (context) => LessonDetailScreen.edit(
                               lessonId: group.lessons[i].id!,
                             ),
                           ),
-                        ).then((_) => _refreshLessons());
+                        ).then((result) {
+                          if (result == true) _refreshLessons();
+                        });
                       },
                       onLongPress: () async {
                         final confirm =
@@ -230,15 +233,16 @@ class _HomeScreenState extends State<HomeScreen> {
             amount: student.price.toDouble(),
           );
           //final id = await dbHelper.insertLesson(newLesson);
-          final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => LessonDetailScreen.create(lesson: newLesson)))
+          //final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => LessonDetailScreen.create(lesson: newLesson)))
           if (context.mounted) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LessonDetailScreen(lessonId: id),
+                builder: (context) =>
+                    LessonDetailScreen.create(lesson: newLesson),
               ),
-            ).then((_) {
-              _refreshLessons();
+            ).then((result) {
+              if (result == true) _refreshLessons();
             });
           }
         },

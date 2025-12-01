@@ -6,10 +6,18 @@ import '../models/lesson.dart';
 import '../models/student.dart';
 
 class LessonDetailScreen extends StatefulWidget {
-  final int lessonId;
+  final Lesson? initialLesson;
+  final int? lessonId;
 
-  const LessonDetailScreen({Key? key, required this.lessonId})
-    : super(key: key);
+  LessonDetailScreen.edit({Key? key, required int lessonId})
+    : initialLesson = null,
+      lessonId = lessonId,
+      super(key: key);
+
+  LessonDetailScreen.create({Key? key, required Lesson lesson})
+    : initialLesson = lesson,
+      lessonId = null,
+      super(key: key);
 
   @override
   State<LessonDetailScreen> createState() => _LessonDetailScreenState();
@@ -19,7 +27,6 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   Lesson? _lesson;
   late Future<List<Student>> _studentsFuture;
   final dbHelper = DBHelper();
-
   final DateFormat _dateFormatter = DateFormat('dd.MM.yyyy');
   final DateFormat _timeFormatter = DateFormat('HH:mm');
 
@@ -27,15 +34,39 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   void initState() {
     super.initState();
     _studentsFuture = dbHelper.getStudents();
-    dbHelper.getLessonById(widget.lessonId).then((lesson) {
-      if (lesson != null) {
-        setState(() {
-          _lesson = lesson;
-        });
-      } else {
-        if (context.mounted) Navigator.pop(context);
+    if (widget.initialLesson != null) {
+      _lesson = widget.initialLesson;
+    } else if (widget.lessonId != null) {
+      dbHelper
+          .getLessonById(widget.lessonId!)
+          .then((lesson) {
+            if (lesson != null) {
+              setState(() {
+                _lesson = lesson;
+              });
+            } else {
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Урок не найден')));
+                Navigator.pop(context);
+              }
+            }
+          })
+          .catchError((error) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $error')));
+            Navigator.pop(context);
+          });
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Ошибка: не указан урок')));
+        Navigator.pop(context);
       }
-    });
+    }
   }
 
   @override
@@ -48,7 +79,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
         title: const Text('Карточка урока'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, false),
         ),
       ),
       body: FutureBuilder<List<Student>>(
@@ -243,12 +274,24 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      await dbHelper.updateLesson(_lesson!);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Изменения сохранены')),
-                        );
-                        Navigator.pop(context);
+                      if (_lesson!.id == null) {
+                        final id = await dbHelper.insertLesson(_lesson!);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Урок добавлен!')),
+                          );
+                          Navigator.pop(context, true);
+                        }
+                      } else {
+                        await dbHelper.updateLesson(_lesson!);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Изменения сохранены'),
+                            ),
+                          );
+                          Navigator.pop(context, true);
+                        }
                       }
                     },
                     child: const Text('Сохранить'),
