@@ -54,7 +54,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         _selectMonth(_selectedMonth.year, month);
                       }
                     },
-                    value: _selectedMonth.month,
+                    initialValue: _selectedMonth.month,
                     items: List.generate(12, (i) => i + 1)
                         .map(
                           (m) => DropdownMenuItem(
@@ -71,7 +71,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: DropdownButtonFormField(
-                    value: _selectedMonth.year,
+                    initialValue: _selectedMonth.year,
                     items: List.generate(5, (i) => DateTime.now().year - 2 + i)
                         .map(
                           (y) => DropdownMenuItem(
@@ -81,8 +81,9 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         )
                         .toList(),
                     onChanged: (year) {
-                      if (year != null)
+                      if (year != null) {
                         _selectMonth(year, _selectedMonth.month);
+                      }
                     },
                     decoration: const InputDecoration(labelText: 'Год'),
                   ),

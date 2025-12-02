@@ -9,15 +9,13 @@ class LessonDetailScreen extends StatefulWidget {
   final Lesson? initialLesson;
   final int? lessonId;
 
-  LessonDetailScreen.edit({Key? key, required int lessonId})
+  const LessonDetailScreen.edit({super.key, required int lessonId})
     : initialLesson = null,
-      lessonId = lessonId,
-      super(key: key);
+      lessonId = lessonId;
 
-  LessonDetailScreen.create({Key? key, required Lesson lesson})
+  const LessonDetailScreen.create({super.key, required Lesson lesson})
     : initialLesson = lesson,
-      lessonId = null,
-      super(key: key);
+      lessonId = null;
 
   @override
   State<LessonDetailScreen> createState() => _LessonDetailScreenState();
@@ -123,7 +121,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
               children: [
                 // Выбор студента
                 DropdownButtonFormField<int>(
-                  value: _lesson!.studentId,
+                  initialValue: _lesson!.studentId,
                   items: students.map((s) {
                     return DropdownMenuItem(
                       value: s.id,
@@ -228,7 +226,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
 
                 // Длительность
                 DropdownButtonFormField<double>(
-                  value: _lesson!.duration,
+                  initialValue: _lesson!.duration,
                   items: const [
                     DropdownMenuItem(value: 1.0, child: Text('1 час')),
                     DropdownMenuItem(value: 1.5, child: Text('1.5 часа')),

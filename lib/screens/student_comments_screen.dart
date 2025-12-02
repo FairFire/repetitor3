@@ -7,11 +7,11 @@ class StudentCommentsScreen extends StatefulWidget {
   final int studentId;
   final String studentName;
 
-  StudentCommentsScreen({
-    Key? key,
+  const StudentCommentsScreen({
+    super.key,
     required this.studentId,
     required this.studentName,
-  }) : super(key: key);
+  });
 
   @override
   State<StudentCommentsScreen> createState() => _StudentCommentsScreenState();

@@ -5,7 +5,7 @@ import 'package:repetitor/screens/student_comments_screen.dart';
 import 'package:repetitor/screens/student_form_screen.dart';
 
 class StudentsScreen extends StatefulWidget {
-  const StudentsScreen({Key? key}) : super(key: key);
+  const StudentsScreen({super.key});
 
   @override
   State<StudentsScreen> createState() => _StudentsScreenState();
@@ -21,7 +21,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     _refreshStudents();
   }
 
-  _refreshStudents() {
+  void _refreshStudents() {
     setState(() {
       _studentsFuture = dbHelper.getStudents();
     });

@@ -6,7 +6,7 @@ import 'package:repetitor/screens/student_comments_screen.dart';
 
 class StudentFormScreen extends StatefulWidget {
   final Student? student;
-  const StudentFormScreen({Key? key, this.student}) : super(key: key);
+  const StudentFormScreen({super.key, this.student});
 
   @override
   State<StudentFormScreen> createState() => _StudentFormScreenState();
@@ -161,7 +161,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                 items: _levels.map((level) {
                   return DropdownMenuItem(value: level, child: Text(level));
                 }).toList(),
-                value: _level,
+                initialValue: _level,
                 onChanged: (val) => setState(() => _level = val!),
                 decoration: const InputDecoration(
                   labelText: 'Уровень',

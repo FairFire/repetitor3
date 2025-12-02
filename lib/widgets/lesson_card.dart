@@ -9,11 +9,11 @@ class LessonCard extends StatelessWidget {
   final VoidCallback onLongPress;
 
   const LessonCard({
-    Key? key,
+    super.key,
     required this.lesson,
     required this.onTap,
     required this.onLongPress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class LessonCard extends StatelessWidget {
         String studentInfo = 'Студент не найден';
         if (snapshot.hasData && snapshot.data != null) {
           final student = snapshot.data!;
-          studentInfo = '${student.fullName}';
+          studentInfo = student.fullName;
         }
 
         //final formatter = DateFormat('dd.MM HH:mm');

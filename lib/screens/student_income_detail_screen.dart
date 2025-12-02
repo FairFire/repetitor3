@@ -9,10 +9,10 @@ class StudentIncomeDetailScreen extends StatelessWidget {
   final DateTime month;
 
   const StudentIncomeDetailScreen({
-    Key? key,
+    super.key,
     required this.studentId,
     required this.month,
-  }) : super(key: key);
+  });
 
   String _formatDuration(double duration) {
     if (duration == 1.0) return '1 час';
@@ -23,7 +23,7 @@ class StudentIncomeDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dbHelper = new DBHelper();
+    final dbHelper = DBHelper();
     final monthFormatted = DateFormat('MMMM yyyy').format(month);
     return Scaffold(
       appBar: AppBar(
