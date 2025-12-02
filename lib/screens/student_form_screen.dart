@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:repetitor/database/db_helper.dart';
 import 'package:repetitor/models/student.dart';
+import 'package:repetitor/screens/student_comments_screen.dart';
 
 class StudentFormScreen extends StatefulWidget {
   final Student? student;
@@ -155,23 +156,6 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                 ),
               ),
 
-              /*ElevatedButton(
-                onPressed: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _startDate,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2050),
-                    locale: const Locale('ru'),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _startDate = picked;
-                    });
-                  }
-                },
-                child: Text('Выберите дату'),
-              ), */
               SizedBox(height: 16),
               DropdownButtonFormField(
                 items: _levels.map((level) {
@@ -183,6 +167,29 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   labelText: 'Уровень',
                   border: OutlineInputBorder(),
                 ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  final student = widget.student;
+                  if (student != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentCommentsScreen(
+                          studentId: student.id!,
+                          studentName: student.fullName,
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Сначала сохраните студента')),
+                    );
+                  }
+                },
+                label: const Text('Комментарии'),
+                icon: Icon(Icons.comment),
               ),
 
               const Spacer(),

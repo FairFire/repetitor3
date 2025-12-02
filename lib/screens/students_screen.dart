@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:repetitor/database/db_helper.dart';
 import 'package:repetitor/models/student.dart';
+import 'package:repetitor/screens/student_comments_screen.dart';
 import 'package:repetitor/screens/student_form_screen.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -72,6 +73,20 @@ class _StudentsScreenState extends State<StudentsScreen> {
                         vertical: 8,
                       ),
                       child: ListTile(
+                        trailing: IconButton(
+                          icon: const Icon(Icons.comment),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => StudentCommentsScreen(
+                                  studentId: student.id!,
+                                  studentName: student.fullName,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         title: Text(student.fullName),
                         subtitle: Text('${student.price} ₽/час'),
                         onTap: () {

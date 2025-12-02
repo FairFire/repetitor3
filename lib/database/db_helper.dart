@@ -8,7 +8,7 @@ import '../models/student.dart';
 class DBHelper {
   static Database? _db;
   static const String _dbName = 'tutor_app.db';
-  static const int _version = 3; // увеличена версия для обновления схемы
+  static const int _version = 1; // увеличена версия для обновления схемы
 
   // Получить экземпляр базы данных
   Future<Database> get db async {
@@ -30,7 +30,7 @@ class DBHelper {
           CREATE TABLE students(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fullName TEXT NOT NULL,
-            price INTEGER NOT NULL
+            price INTEGER NOT NULL,
             startDate INTEGER NOT NULL,
             level TEXT NOT NULL
           )
@@ -46,6 +46,7 @@ class DBHelper {
             FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
           )
         ''');
+
         await db.execute('''
           CREATE TABLE comments(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +57,7 @@ class DBHelper {
           )
         ''');
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
+      /*onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           // Добавляем новые колонки
           await db.execute(
@@ -73,7 +74,7 @@ class DBHelper {
             [nowMs, 'A1'],
           );
         }
-      },
+      },*/
     );
   }
 
@@ -206,7 +207,7 @@ class DBHelper {
   Future<List<Comment>> getCommentsByStudent(int studentId) async {
     final db = await this.db;
     final maps = await db.query(
-      'commets',
+      'comments',
       where: 'studentId = ?',
       whereArgs: [studentId],
       orderBy: 'createdAt DESC',
