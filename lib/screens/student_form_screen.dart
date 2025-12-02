@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:repetitor/database/db_helper.dart';
 import 'package:repetitor/models/student.dart';
 
@@ -14,7 +15,11 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _priceController;
+  late DateTime _startDate;
+  late String _level;
   final _dbHelper = DBHelper();
+  static const List<String> _levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  final DateFormat _dateFormatter = DateFormat('dd.MM.yyyy');
 
   @override
   void initState() {
@@ -24,6 +29,8 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
     _priceController = TextEditingController(
       text: student?.price.toString() ?? '',
     );
+    _startDate = student?.startDate ?? DateTime.now();
+    _level = student?.level ?? 'A1';
   }
 
   @override
@@ -48,6 +55,8 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
         id: widget.student?.id,
         fullName: name,
         price: price,
+        startDate: _startDate,
+        level: _level,
       );
 
       if (widget.student == null) {
@@ -99,13 +108,13 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              const Text('Цена за час'),
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
-                  hintText: '2000',
+                  labelText: 'Цена за час (Р)',
                   border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
                   final num = int.tryParse(value ?? '');
                   if (num == null || num <= 0) {
@@ -115,6 +124,67 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   }
                 },
               ),
+              const SizedBox(height: 20),
+
+              InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _startDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2050),
+                    locale: const Locale('ru'),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _startDate = picked;
+                    });
+                  }
+                },
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'Дата начала занятий',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.calendar_today),
+                  ),
+                  child: Text(
+                    _dateFormatter.format(_startDate),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+
+              /*ElevatedButton(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _startDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2050),
+                    locale: const Locale('ru'),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _startDate = picked;
+                    });
+                  }
+                },
+                child: Text('Выберите дату'),
+              ), */
+              SizedBox(height: 16),
+              DropdownButtonFormField(
+                items: _levels.map((level) {
+                  return DropdownMenuItem(value: level, child: Text(level));
+                }).toList(),
+                value: _level,
+                onChanged: (val) => setState(() => _level = val!),
+                decoration: const InputDecoration(
+                  labelText: 'Уровень',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
               const Spacer(),
               SizedBox(
                 width: double.infinity,

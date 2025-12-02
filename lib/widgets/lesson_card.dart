@@ -24,10 +24,11 @@ class LessonCard extends StatelessWidget {
         String studentInfo = 'Студент не найден';
         if (snapshot.hasData && snapshot.data != null) {
           final student = snapshot.data!;
-          studentInfo = '${student.fullName} (${student.price} ₽/ч)';
+          studentInfo = '${student.fullName}';
         }
 
-        final formatter = DateFormat('dd.MM HH:mm');
+        //final formatter = DateFormat('dd.MM HH:mm');
+        final formatter = DateFormat('HH:mm');
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListTile(
