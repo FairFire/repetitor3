@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.attach_money),
+              leading: const Icon(Icons.monetization_on),
               title: const Text('Доход'),
               selected: _selectedIndex == 2,
               onTap: () {

@@ -39,7 +39,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final monthName = DateFormat('MM.yyyy').format(_selectedMonth);
+    final monthName = DateFormat('MM.yyyy', 'ru').format(_selectedMonth);
     return Scaffold(
       body: Column(
         children: [
@@ -60,7 +60,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           (m) => DropdownMenuItem(
                             value: m,
                             child: Text(
-                              DateFormat('MMMM').format(DateTime(2020, m)),
+                              DateFormat(
+                                'MMMM',
+                                'ru',
+                              ).format(DateTime(2020, m)),
                             ),
                           ),
                         )
