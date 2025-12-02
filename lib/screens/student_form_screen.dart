@@ -133,7 +133,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   final picked = await showDatePicker(
                     context: context,
                     initialDate: _startDate,
-                    firstDate: DateTime(2020),
+                    firstDate: DateTime(2010),
                     lastDate: DateTime(2050),
                     locale: const Locale('ru'),
                   );
