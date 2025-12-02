@@ -275,7 +275,8 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_lesson!.id == null) {
-                        final id = await dbHelper.insertLesson(_lesson!);
+                        // final id = await dbHelper.insertLesson(_lesson!);
+                        await dbHelper.insertLesson(_lesson!);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Урок добавлен!')),
