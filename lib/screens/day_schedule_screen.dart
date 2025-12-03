@@ -163,7 +163,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                         subtitle: Text(
                           '${time} - ${_formatDuration(lesson.duration)}',
                         ),
-                        leading: Checkbox(
+                        trailing: Checkbox(
                           value: lesson.isCompleted,
                           onChanged: (value) async {
                             if (value != null) {
