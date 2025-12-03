@@ -181,7 +181,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                                               'Студент №$studentID',
                                         ),
                                         subtitle: Text(
-                                          '${totalHours.toStringAsFixed(1)} ч * ${totalAmount.toStringAsFixed(0)} P',
+                                          '${totalHours.toStringAsFixed(1)} ч - ${totalAmount.toStringAsFixed(0)} P',
                                         ),
                                         trailing: Text(
                                           '+${totalAmount.toStringAsFixed(0)} P',

@@ -156,7 +156,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: const Text('Урок удален')),
                         );
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                       child: ListTile(
                         title: Text(studentName),
