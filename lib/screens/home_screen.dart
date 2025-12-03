@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+//import 'package:path/path.dart';
+import 'package:repetitor/models/student.dart';
+import 'package:repetitor/screens/day_schedule_screen.dart';
 import '../database/db_helper.dart';
 import '../models/lesson.dart';
 import '../screens/lesson_detail_screen.dart';
-import '../widgets/lesson_card.dart';
+//import '../widgets/lesson_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,20 +15,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MyLessonGroup {
-  final DateTime date;
-  final String dayName;
-  final List<Lesson> lessons;
-
-  _MyLessonGroup(this.date, this.dayName, this.lessons);
-}
-
 class _HomeScreenState extends State<HomeScreen> {
   late DateTime _currentWeekStart;
   late Future<List<Lesson>> _lessonsFuture;
   final dbHelper = DBHelper();
-  final DateFormat _dayFormat = DateFormat('dd.MM');
-  //final DateFormat _fullDateFormat = DateFormat('dd.MM.yyyy');
+  final DateFormat _shortDayFormat = DateFormat('E', 'ru');
 
   @override
   void initState() {
@@ -59,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  List<_MyLessonGroup> _groupLessonsByDate(List<Lesson> lessons) {
+  Map<DateTime, List<Lesson>> _groupLessonsByDay(List<Lesson> lessons) {
     final Map<DateTime, List<Lesson>> grouped = {};
     for (final lesson in lessons) {
       final dateOnly = DateTime(
@@ -69,37 +63,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       grouped.putIfAbsent(dateOnly, () => []).add(lesson);
     }
-
-    final List<_MyLessonGroup> result = [];
-    for (int i = 0; i < 7; i++) {
-      final dayDate = _currentWeekStart.add(Duration(days: i));
-      if (grouped.containsKey(dayDate)) {
-        final dayName = _getDayName(dayDate.weekday);
-        result.add(_MyLessonGroup(dayDate, dayName, grouped[dayDate]!));
-      }
-    }
-    return result;
+    return grouped;
   }
 
-  String _getDayName(int weekday) {
-    switch (weekday) {
-      case DateTime.monday:
-        return 'Понедельник';
-      case DateTime.tuesday:
-        return 'Вторник';
-      case DateTime.wednesday:
-        return 'Среда';
-      case DateTime.thursday:
-        return 'Четверг';
-      case DateTime.friday:
-        return 'Пятница';
-      case DateTime.saturday:
-        return 'Суббота';
-      case DateTime.sunday:
-        return 'Воскресенье';
-      default:
-        return 'День';
-    }
+  String _formatDuration(double duration) {
+    if (duration == 1.0) return '1 ч';
+    if (duration == 1.5) return '1.5 ч';
+    if (duration == 2.0) return '2 ч';
+    return '${duration.toStringAsFixed(1)} ч';
   }
 
   @override
@@ -137,79 +108,19 @@ class _HomeScreenState extends State<HomeScreen> {
           if (lessons.isEmpty) {
             return const Center(child: Text('Нет занятий на эту неделю'));
           }
-          final groups = _groupLessonsByDate(lessons);
+          final groupedLessons = _groupLessonsByDay(lessons);
 
-          return ListView.builder(
-            itemCount: groups.length,
-            itemBuilder: (context, index) {
-              final group = groups[index];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 16,
-                    ),
-                    color: Colors.grey.shade200,
-                    child: Text(
-                      '${group.dayName}, ${_dayFormat.format(group.date)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ...List.generate(
-                    group.lessons.length,
-                    (i) => LessonCard(
-                      lesson: group.lessons[i],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LessonDetailScreen.edit(
-                              lessonId: group.lessons[i].id!,
-                            ),
-                          ),
-                        ).then((result) {
-                          if (result == true) _refreshLessons();
-                        });
-                      },
-                      onLongPress: () async {
-                        final confirm =
-                            await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Удалить урок?'),
-                                content: const Text(
-                                  'Это действие нельзя отменить',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Отмена'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx, true),
-                                    child: const Text('Удалить'),
-                                  ),
-                                ],
-                              ),
-                            ) ??
-                            false;
-                        if (confirm) {
-                          await dbHelper.deleteLesson(group.lessons[i].id!);
-                          _refreshLessons();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Урок удален')),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              );
-            },
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: List.generate(7, (i) {
+                  final dayDate = _currentWeekStart.add(Duration(days: i));
+                  final dayLessons = groupedLessons[dayDate] ?? [];
+                  return _buildDayButton(context, dayDate, dayLessons);
+                }),
+              ),
+            ),
           );
         },
       ),
@@ -247,6 +158,84 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildDayButton(
+    BuildContext context,
+    DateTime dayDate,
+    List<Lesson> lessons,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.all(16),
+          backgroundColor: lessons.isEmpty ? Colors.grey.shade200 : null,
+        ),
+        onPressed: lessons.isEmpty
+            ? null
+            : () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DayScheduleScreen(
+                      date: dayDate,
+                      initialLessons: lessons,
+                    ),
+                  ),
+                ).then((result) {
+                  if (result == true) {
+                    _refreshLessons();
+                  }
+                });
+              },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Column(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  _shortDayFormat.format(dayDate).substring(0, 2),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  DateFormat('dd.MM').format(dayDate),
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: lessons.map((lesson) {
+                  return FutureBuilder<Student?>(
+                    future: dbHelper.getStudentById(lesson.studentId),
+                    builder: (context, snapshot) {
+                      final studentName = snapshot.hasData
+                          ? snapshot.data!.fullName
+                          : 'Студент';
+                      final time = DateFormat('HH:mm').format(lesson.dateTime);
+                      return Text(
+                        '$time (${_formatDuration(lesson.duration)})',
+                        style: TextStyle(fontSize: 18),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
