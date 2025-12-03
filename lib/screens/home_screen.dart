@@ -110,15 +110,21 @@ class _HomeScreenState extends State<HomeScreen> {
           }
           final groupedLessons = _groupLessonsByDay(lessons);
 
+          final List<DateTime> dayWithLesson = [];
+          for (int i = 0; i < 7; i++) {
+            final dayDate = _currentWeekStart.add(Duration(days: i));
+            if (groupedLessons.containsKey(dayDate)) {
+              dayWithLesson.add(dayDate);
+            }
+          }
           return SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Column(
-                children: List.generate(7, (i) {
-                  final dayDate = _currentWeekStart.add(Duration(days: i));
-                  final dayLessons = groupedLessons[dayDate] ?? [];
+                children: dayWithLesson.map((dayDate) {
+                  final dayLessons = groupedLessons[dayDate]!;
                   return _buildDayButton(context, dayDate, dayLessons);
-                }),
+                }).toList(),
               ),
             ),
           );
