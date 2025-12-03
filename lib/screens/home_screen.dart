@@ -226,8 +226,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           : 'Студент';
                       final time = DateFormat('HH:mm').format(lesson.dateTime);
                       return Text(
-                        '$time (${_formatDuration(lesson.duration)})',
-                        style: TextStyle(fontSize: 18),
+                        '$studentName - $time -(${_formatDuration(lesson.duration)})',
+                        style: TextStyle(
+                          fontSize: 18,
+                          decoration: lesson.isCompleted
+                              ? TextDecoration.lineThrough
+                              : null,
+                        ),
                       );
                     },
                   );

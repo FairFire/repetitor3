@@ -43,6 +43,7 @@ class DBHelper {
             dateTime INTEGER NOT NULL,
             duration REAL NOT NULL,
             amount REAL NOT NULL,
+            isCompleted INTEGER NOT NULL DEFAULT 0,
             FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
           )
         ''');
@@ -57,24 +58,6 @@ class DBHelper {
           )
         ''');
       },
-      /*onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          // Добавляем новые колонки
-          await db.execute(
-            'ALTER TABLE students ADD COLUMN startDate INTEGER DEFAULT 0',
-          );
-          await db.execute(
-            'ALTER TABLE students ADD COLUMN level TEXT DEFAULT "A1"',
-          );
-
-          // Обновляем существующие записи (если нужно)
-          final nowMs = DateTime.now().millisecondsSinceEpoch;
-          await db.execute(
-            'UPDATE students SET startDate = ?, level = ? WHERE startDate = 0',
-            [nowMs, 'A1'],
-          );
-        }
-      },*/
     );
   }
 

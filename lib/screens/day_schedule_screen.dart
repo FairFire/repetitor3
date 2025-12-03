@@ -163,6 +163,25 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
                         subtitle: Text(
                           '${time} - ${_formatDuration(lesson.duration)}',
                         ),
+                        leading: Checkbox(
+                          value: lesson.isCompleted,
+                          onChanged: (value) async {
+                            if (value != null) {
+                              final updateLesson = Lesson(
+                                id: lesson.id,
+                                studentId: lesson.studentId,
+                                dateTime: lesson.dateTime,
+                                duration: lesson.duration,
+                                isCompleted: value,
+                                amount: lesson.amount,
+                              );
+                              await dbHelper.updateLesson(updateLesson);
+                              setState(() {
+                                _lessons[index] = updateLesson;
+                              });
+                            }
+                          },
+                        ),
                         onTap: () => _editLesson(lesson),
                         onLongPress: () => _deleteLesson(lesson),
                       ),

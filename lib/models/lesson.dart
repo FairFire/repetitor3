@@ -4,6 +4,7 @@ class Lesson {
   DateTime dateTime;
   double duration; // 1 или 2 часа
   double amount; // сумма на момент урока (фиксированная)
+  bool isCompleted;
 
   Lesson({
     this.id,
@@ -11,6 +12,7 @@ class Lesson {
     required this.dateTime,
     required this.duration,
     required this.amount,
+    this.isCompleted = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class Lesson {
       'dateTime': dateTime.millisecondsSinceEpoch,
       'duration': duration,
       'amount': amount,
+      'isCompleted': isCompleted ? 1 : 0,
     };
   }
 
@@ -30,6 +33,7 @@ class Lesson {
       dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
       duration: (map['duration'] as num).toDouble(),
       amount: (map['amount'] as num).toDouble(),
+      isCompleted: (map['isCompleted'] as int?) == 1,
     );
   }
 }

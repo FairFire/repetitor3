@@ -265,8 +265,30 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   ),
                   enabled: false,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
 
+                ListTile(
+                  title: const Text('Урок проведён'),
+                  leading: Checkbox(
+                    value: _lesson!.isCompleted,
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _lesson = Lesson(
+                            id: _lesson!.id,
+                            studentId: _lesson!.studentId,
+                            dateTime: _lesson!.dateTime,
+                            duration: _lesson!.duration,
+                            amount: _lesson!.amount,
+                            isCompleted: value,
+                          );
+                        });
+                      }
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 32),
                 // Кнопка сохранения
                 SizedBox(
                   width: double.infinity,
