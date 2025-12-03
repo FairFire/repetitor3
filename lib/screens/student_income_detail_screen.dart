@@ -24,7 +24,7 @@ class StudentIncomeDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dbHelper = DBHelper();
-    final monthFormatted = DateFormat('MMMM yyyy').format(month);
+    final monthFormatted = DateFormat('MMMM yyyy', 'ru').format(month);
     return Scaffold(
       appBar: AppBar(
         title: Text('Детализация'),
@@ -51,12 +51,12 @@ class StudentIncomeDetailScreen extends StatelessWidget {
               }
               final lessons = lessonSnapshot.data ?? [];
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Студент: $fullName',
+                      'Ученик: $fullName',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -67,7 +67,11 @@ class StudentIncomeDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       'Занятий в $monthFormatted:',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   SizedBox(height: 8),
@@ -79,7 +83,8 @@ class StudentIncomeDetailScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final lesson = lessons[index];
                               final dateStr = DateFormat(
-                                'dd.MMMM.yyyy HH:mm',
+                                'dd MMMM yyyy HH:mm',
+                                'ru',
                               ).format(lesson.dateTime);
                               return ListTile(
                                 title: Text(dateStr),

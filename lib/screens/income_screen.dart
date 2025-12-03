@@ -63,7 +63,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                               DateFormat(
                                 'MMMM',
                                 'ru',
-                              ).format(DateTime(2020, m)),
+                              ).format(DateTime(2010, m)),
                             ),
                           ),
                         )
@@ -75,7 +75,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 Expanded(
                   child: DropdownButtonFormField(
                     initialValue: _selectedMonth.year,
-                    items: List.generate(5, (i) => DateTime.now().year - 2 + i)
+                    items: List.generate(10, (i) => DateTime.now().year - 5 + i)
                         .map(
                           (y) => DropdownMenuItem(
                             value: y,
@@ -124,7 +124,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
                         vertical: 8,
                       ),
                       child: Text(
-                        'Итого за $monthName: ${totalIncome.toStringAsFixed(0)} P',
+                        'Итого за $monthName: ${totalIncome.toStringAsFixed(0)} ₽',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
