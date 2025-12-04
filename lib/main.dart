@@ -65,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
           0 => const Text('Расписание'),
           1 => const Text('Студенты'),
           2 => const Text('Доход за месяц'),
+          3 => const Text('Настройка'),
           _ => const Text('Репетитор'),
         },
       ),
@@ -104,6 +105,14 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pop(context);
                 _onItemTap(2);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Настройка'),
+              selected: _selectedIndex == 3,
+              onTap: () {
+                Navigator.pop(context);
               },
             ),
           ],
