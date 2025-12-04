@@ -11,10 +11,10 @@ class SettingScreen extends StatelessWidget {
 
   Future<String> _getAddDbPath() async {
     final dir = await getDatabasesPath();
-    return path.join(dir, 'repetitor.db');
+    return path.join(dir, 'tutor_app.db');
   }
 
-  Future<void> _exportDatabase() async {
+  Future<void> _exportDatabase(BuildContext context) async {
     String pathDownload = '/storage/emulated/0/Download';
     if (Platform.isAndroid) {
       final status = await Permission.manageExternalStorage.request();
@@ -31,7 +31,7 @@ class SettingScreen extends StatelessWidget {
       final dbPath = await _getAddDbPath();
       final dbFile = File(dbPath);
       if (!await dbFile.exists()) {
-        _showMessage('База данных не найдена');
+        _showMessage(context, 'База данных не найдена');
         return;
       }
 
@@ -46,13 +46,17 @@ class SettingScreen extends StatelessWidget {
         '${downloadsDir.path}/tutor_backup_${DateTime.now().millisecondsSinceEpoch}.db',
       );
       await dbFile.copy(targetFile.path);
-      _showMessage('Резервная копия сохранена: \n ${targetFile.path}');
+      _showMessage2(
+        context,
+        'Успешно',
+        'Резервная копия сохранена: \n ${targetFile.path}',
+      );
     } catch (e) {
-      _showMessage('Ошиибка экспорта: $e');
+      _showMessage(context, 'Ошиибка экспорта: $e');
     }
   }
 
-  Future<void> _importDatabase() async {
+  Future<void> _importDatabase(BuildContext context) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -64,7 +68,7 @@ class SettingScreen extends StatelessWidget {
       final filePath = result.files.single.path!;
       final sourceFile = File(filePath);
       if (!await sourceFile.exists()) {
-        _showMessage('Файл не найден');
+        _showMessage(context, 'Файл не найден');
         return;
       }
 
@@ -72,16 +76,37 @@ class SettingScreen extends StatelessWidget {
       final targetFile = File(dbPath);
 
       await sourceFile.copy(dbPath);
-      _showMessage('База данных восстановлена! \n Перезагрузите приложение');
+      _showMessage2(context, 'Успешно', 'База данных восстановлена');
     } catch (e) {
-      _showMessage('Ошибка импорта: $e');
+      _showMessage(context, 'Ошибка импорта: $e');
     }
   }
 
-  void _showMessage(String message) {
+  Future<void> _showMessage2(
+    BuildContext context,
+    String title,
+    String content,
+  ) async {
+    if (!context.mounted) return;
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: SingleChildScrollView(child: Text(content)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMessage(BuildContext context, String message) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ScaffoldMessenger.of(
-        GlobalKey<NavigatorState>().currentContext!,
+        context,
       ).showSnackBar(SnackBar(content: Text(message)));
     });
   }
@@ -103,15 +128,15 @@ class SettingScreen extends StatelessWidget {
             const Text('Экспорт: сохранит файл базы данных в папку Download.'),
             const SizedBox(height: 8),
             ElevatedButton.icon(
-              onPressed: _exportDatabase,
-              label: const Text('Создать резеврную копию'),
+              onPressed: () => _exportDatabase(context),
+              label: const Text('Создать резервную копию'),
               icon: const Icon(Icons.save),
             ),
             const SizedBox(height: 24),
             const Text('Импорт: заменит текущую базу данных выбранным файлом'),
             const SizedBox(height: 8),
             ElevatedButton.icon(
-              onPressed: _importDatabase,
+              onPressed: () => _importDatabase(context),
               icon: const Icon(Icons.upload),
               label: const Text('Восстановить из файла'),
             ),

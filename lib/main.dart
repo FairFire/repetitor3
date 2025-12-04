@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:repetitor/screens/setting_screen.dart';
 //import 'package:intl/date_symbol_data_file.dart' as file;
 import 'screens/home_screen.dart';
 import 'screens/students_screen.dart';
@@ -47,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     HomeScreen(),
     StudentsScreen(),
     IncomeScreen(),
+    SettingScreen(),
   ];
 
   void _onItemTap(int index) {
@@ -113,6 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pop(context);
+                _onItemTap(3);
               },
             ),
           ],
