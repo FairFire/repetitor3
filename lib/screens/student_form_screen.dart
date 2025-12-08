@@ -16,6 +16,8 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _priceController;
+  late TextEditingController _phone1Controller;
+  late TextEditingController _phone2Controller;
   late DateTime _startDate;
   late String _level;
   final _dbHelper = DBHelper();
@@ -30,6 +32,8 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
     _priceController = TextEditingController(
       text: student?.price.toString() ?? '',
     );
+    _phone1Controller = TextEditingController(text: student?.phone1 ?? '');
+    _phone2Controller = TextEditingController(text: student?.phone2 ?? '');
     _startDate = student?.startDate ?? DateTime.now();
     _level = student?.level ?? 'A1';
   }
@@ -47,6 +51,12 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
 
       final name = _nameController.text.trim();
       final price = int.tryParse(_priceController.text.trim()) ?? 1000;
+      final phone1 = _phone1Controller.text.trim().isEmpty
+          ? '-'
+          : _phone1Controller.text.trim();
+      final phone2 = _phone2Controller.text.trim().isEmpty
+          ? '-'
+          : _phone2Controller.text.trim();
 
       if (name.isEmpty || price <= 0) {
         return;
@@ -58,6 +68,8 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
         price: price,
         startDate: _startDate,
         level: _level,
+        phone1: phone1,
+        phone2: phone2,
       );
 
       if (widget.student == null) {
@@ -168,6 +180,27 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _phone1Controller,
+                decoration: const InputDecoration(
+                  labelText: 'Телефон 1',
+                  hintText: 'Необязательное поле',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _phone2Controller,
+                decoration: const InputDecoration(
+                  labelText: 'Телефон 2',
+                  hintText: 'Необязательное поле',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+
               SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {

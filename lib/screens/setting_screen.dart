@@ -73,7 +73,7 @@ class SettingScreen extends StatelessWidget {
       }
 
       final dbPath = await _getAddDbPath();
-      final targetFile = File(dbPath);
+      //final targetFile = File(dbPath);
 
       await sourceFile.copy(dbPath);
       _showMessage2(context, 'Успешно', 'База данных восстановлена');

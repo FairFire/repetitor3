@@ -4,6 +4,8 @@ class Student {
   int price;
   DateTime startDate;
   String level;
+  String? phone1;
+  String? phone2;
 
   Student({
     this.id,
@@ -11,6 +13,8 @@ class Student {
     required this.price,
     required this.startDate,
     required this.level,
+    this.phone1,
+    this.phone2,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +24,8 @@ class Student {
       'price': price,
       'startDate': startDate.millisecondsSinceEpoch,
       'level': level,
+      'phone1': phone1,
+      'phone2': phone2,
     };
   }
 
@@ -30,6 +36,8 @@ class Student {
       price: map['price'],
       startDate: DateTime.fromMillisecondsSinceEpoch(map['startDate']),
       level: map['level'],
+      phone1: map['phone1'],
+      phone2: map['phone2'],
     );
   }
 }

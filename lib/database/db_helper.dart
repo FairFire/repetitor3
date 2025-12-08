@@ -32,7 +32,9 @@ class DBHelper {
             fullName TEXT NOT NULL,
             price INTEGER NOT NULL,
             startDate INTEGER NOT NULL,
-            level TEXT NOT NULL
+            level TEXT NOT NULL,
+            phone1 TEXT,
+            phone2 TEXT
           )
         ''');
 
