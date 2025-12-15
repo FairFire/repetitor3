@@ -87,6 +87,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
           widget.student == null ? 'Новый студент' : 'Редактирование студента',
@@ -96,144 +97,148 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
           icon: Icon(Icons.close),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'ФИО студента',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  hintText: 'Иванов Иван Иванович',
-                  border: OutlineInputBorder(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'ФИО студента',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите ФИО студента';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Цена за час (Р)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  final num = int.tryParse(value ?? '');
-                  if (num == null || num <= 0) {
-                    return 'Введите корректную цену занятия';
-                  } else {
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Иванов Иван Иванович',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите ФИО студента';
+                    }
                     return null;
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _startDate,
-                    firstDate: DateTime(2010),
-                    lastDate: DateTime(2050),
-                    locale: const Locale('ru'),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _startDate = picked;
-                    });
-                  }
-                },
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: 'Дата начала занятий',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.calendar_today),
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Цена за час (Р)',
+                    border: OutlineInputBorder(),
                   ),
-                  child: Text(
-                    _dateFormatter.format(_startDate),
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    final num = int.tryParse(value ?? '');
+                    if (num == null || num <= 0) {
+                      return 'Введите корректную цену занятия';
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _startDate,
+                      firstDate: DateTime(2010),
+                      lastDate: DateTime(2050),
+                      locale: const Locale('ru'),
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _startDate = picked;
+                      });
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Дата начала занятий',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.calendar_today),
+                    ),
+                    child: Text(
+                      _dateFormatter.format(_startDate),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 16),
-              DropdownButtonFormField(
-                items: _levels.map((level) {
-                  return DropdownMenuItem(value: level, child: Text(level));
-                }).toList(),
-                initialValue: _level,
-                onChanged: (val) => setState(() => _level = val!),
-                decoration: const InputDecoration(
-                  labelText: 'Уровень',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16),
+                DropdownButtonFormField(
+                  items: _levels.map((level) {
+                    return DropdownMenuItem(value: level, child: Text(level));
+                  }).toList(),
+                  initialValue: _level,
+                  onChanged: (val) => setState(() => _level = val!),
+                  decoration: const InputDecoration(
+                    labelText: 'Уровень',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _phone1Controller,
-                decoration: const InputDecoration(
-                  labelText: 'Телефон 1',
-                  hintText: 'Необязательное поле',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _phone1Controller,
+                  decoration: const InputDecoration(
+                    labelText: 'Телефон 1',
+                    hintText: 'Необязательное поле',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
                 ),
-                keyboardType: TextInputType.phone,
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _phone2Controller,
-                decoration: const InputDecoration(
-                  labelText: 'Телефон 2',
-                  hintText: 'Необязательное поле',
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _phone2Controller,
+                  decoration: const InputDecoration(
+                    labelText: 'Телефон 2',
+                    hintText: 'Необязательное поле',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
                 ),
-                keyboardType: TextInputType.phone,
-              ),
 
-              SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  final student = widget.student;
-                  if (student != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => StudentCommentsScreen(
-                          studentId: student.id!,
-                          studentName: student.fullName,
+                SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    final student = widget.student;
+                    if (student != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StudentCommentsScreen(
+                            studentId: student.id!,
+                            studentName: student.fullName,
+                          ),
                         ),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Сначала сохраните студента')),
-                    );
-                  }
-                },
-                label: const Text('Комментарии'),
-                icon: Icon(Icons.comment),
-              ),
-
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveStudent,
-                  child: Text(widget.student == null ? 'Добавить' : 'Изменить'),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Сначала сохраните студента')),
+                      );
+                    }
+                  },
+                  label: const Text('Комментарии'),
+                  icon: Icon(Icons.comment),
                 ),
-              ),
-            ],
+
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _saveStudent,
+                    child: Text(
+                      widget.student == null ? 'Добавить' : 'Изменить',
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

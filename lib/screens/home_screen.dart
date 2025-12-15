@@ -79,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final weekEnd = _currentWeekStart.add(const Duration(days: 6));
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

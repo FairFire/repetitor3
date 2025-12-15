@@ -61,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final currentScreen = _widgetOptions.elementAt(_selectedIndex);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       //body: _widgetOptions.elementAt(_selectedIndex),
       appBar: AppBar(
         title: switch (_selectedIndex) {

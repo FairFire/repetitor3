@@ -41,6 +41,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
   Widget build(BuildContext context) {
     final monthName = DateFormat('MM.yyyy', 'ru').format(_selectedMonth);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Column(
         children: [
           Padding(

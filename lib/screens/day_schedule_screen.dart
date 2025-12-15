@@ -121,6 +121,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
   Widget build(BuildContext context) {
     final fullDayName = DateFormat('EEEE, dd.MM.yyyy').format(widget.date);
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(fullDayName),
         leading: IconButton(

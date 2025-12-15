@@ -73,6 +73,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: const Text('Карточка урока'),
         leading: IconButton(

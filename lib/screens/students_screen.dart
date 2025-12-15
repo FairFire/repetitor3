@@ -39,6 +39,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
           icon: Icon(Icons.close),
         ),
       ),*/
+      resizeToAvoidBottomInset: true,
       body: FutureBuilder(
         future: _studentsFuture,
         builder: (context, snapshot) {

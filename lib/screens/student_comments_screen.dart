@@ -57,6 +57,7 @@ class _StudentCommentsScreenState extends State<StudentCommentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text('Комментарии: ${widget.studentName}'),
         leading: IconButton(
@@ -64,57 +65,59 @@ class _StudentCommentsScreenState extends State<StudentCommentsScreen> {
           icon: Icon(Icons.arrow_back),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder(
-              future: _commentsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Ошибка: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('Нет комментариев'));
-                }
-                final comments = snapshot.data ?? [];
-                return comments.isEmpty
-                    ? const Center(child: Text('Нет комментариев'))
-                    : ListView.builder(
-                        itemCount: comments.length,
-                        reverse: true,
-                        itemBuilder: (context, index) {
-                          final comment = comments[index];
-                          return _buildCommentItem(comment);
-                        },
-                      );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder(
+                future: _commentsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Ошибка: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('Нет комментариев'));
+                  }
+                  final comments = snapshot.data ?? [];
+                  return comments.isEmpty
+                      ? const Center(child: Text('Нет комментариев'))
+                      : ListView.builder(
+                          itemCount: comments.length,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            final comment = comments[index];
+                            return _buildCommentItem(comment);
+                          },
+                        );
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    decoration: const InputDecoration(
-                      hintText: 'Напишите комментарий...',
-                      border: OutlineInputBorder(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _textController,
+                      decoration: const InputDecoration(
+                        hintText: 'Напишите комментарий...',
+                        border: OutlineInputBorder(),
+                      ),
+                      onSubmitted: (_) => _addComment(),
                     ),
-                    onSubmitted: (_) => _addComment(),
                   ),
-                ),
-                const SizedBox(width: 8),
-                FloatingActionButton(
-                  heroTag: 'send_comment',
-                  onPressed: _addComment,
-                  child: const Icon(Icons.send),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  FloatingActionButton(
+                    heroTag: 'send_comment',
+                    onPressed: _addComment,
+                    child: const Icon(Icons.send),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

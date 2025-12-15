@@ -114,6 +114,7 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text('Настройка'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsetsGeometry.all(16.0),
