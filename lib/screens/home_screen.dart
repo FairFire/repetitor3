@@ -180,6 +180,9 @@ class _HomeScreenState extends State<HomeScreen> {
         style: ElevatedButton.styleFrom(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           backgroundColor: lessons.isEmpty ? Colors.grey.shade200 : null,
         ),
         onPressed: lessons.isEmpty
@@ -193,10 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       initialLessons: lessons,
                     ),
                   ),
-                ).then((result) {
-                  if (result == true) {
-                    _refreshLessons();
-                  }
+                ).then((_) {
+                  _refreshLessons();
                 });
               },
         child: Row(
@@ -233,7 +234,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           : 'Студент';
                       final time = DateFormat('HH:mm').format(lesson.dateTime);
                       return Text(
-                        '$studentName - $time -(${_formatDuration(lesson.duration)})',
+                        //'$studentName - $time -(${_formatDuration(lesson.duration)})',
+                        '$time - $studentName',
                         style: TextStyle(
                           fontSize: 18,
                           decoration: lesson.isCompleted

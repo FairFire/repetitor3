@@ -27,6 +27,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   final dbHelper = DBHelper();
   final DateFormat _dateFormatter = DateFormat('dd.MM.yyyy');
   final DateFormat _timeFormatter = DateFormat('HH:mm');
+  bool _isAmountManuallySet = false;
 
   @override
   void initState() {
@@ -88,13 +89,13 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (studentsSnapshot.hasError || studentsSnapshot.data == null) {
-            return const Center(child: Text('Не удалось загрузить студентов'));
+            return const Center(child: Text('Не удалось загрузить учеников'));
           }
 
           final students = studentsSnapshot.data!;
           if (students.isEmpty) {
             return const Center(
-              child: Text('Нет студентов. Добавьте хотя бы одного.'),
+              child: Text('Нет учеников. Добавьте хотя бы одного.'),
             );
           }
           students.sort((a, b) => a.fullName.compareTo(b.fullName));
@@ -148,7 +149,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                     }
                   },
                   decoration: const InputDecoration(
-                    labelText: 'Студент',
+                    labelText: 'Ученик',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -255,22 +256,61 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                 const SizedBox(height: 16),
 
                 // Сумма (только для чтения)
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Сумма (₽)',
-                    helperText:
-                        'Рассчитана: ${currentStudent.price} ₽/ч × ${_lesson!.duration} ч',
-                    border: OutlineInputBorder(),
-                  ),
-                  controller: TextEditingController(
-                    text: _lesson!.amount.toStringAsFixed(0),
-                  ),
-                  enabled: false,
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Сумма (₽)',
+                          helperText: _isAmountManuallySet
+                              ? 'Введено вручную'
+                              : 'Рассчитана: ${currentStudent.price} ₽/ч × ${_lesson!.duration} ч',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                        initialValue: _lesson!.amount.toStringAsFixed(0),
+                        onChanged: (value) {
+                          final parsed = double.tryParse(value);
+                          if (parsed != null) {
+                            setState(() {
+                              _lesson = Lesson(
+                                id: _lesson!.id,
+                                studentId: _lesson!.studentId,
+                                dateTime: _lesson!.dateTime,
+                                duration: _lesson!.duration,
+                                amount: parsed,
+                              );
+                              _isAmountManuallySet = true;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      tooltip: 'Вернуть автосумму',
+                      onPressed: () {
+                        setState(() {
+                          _lesson = Lesson(
+                            id: _lesson!.id,
+                            studentId: _lesson!.studentId,
+                            dateTime: _lesson!.dateTime,
+                            duration: _lesson!.duration,
+                            amount:
+                                currentStudent.price *
+                                _lesson!.duration.toDouble(),
+                          );
+                          _isAmountManuallySet = false;
+                        });
+                      },
+                      icon: const Icon(Icons.refresh, size: 18),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
                 ListTile(
-                  title: const Text('Урок проведён'),
+                  title: const Text('Урок оплачен'),
                   leading: Checkbox(
                     value: _lesson!.isCompleted,
                     onChanged: (value) {
