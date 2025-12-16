@@ -97,6 +97,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
               child: Text('Нет студентов. Добавьте хотя бы одного.'),
             );
           }
+          students.sort((a, b) => a.fullName.compareTo(b.fullName));
 
           // Убедимся, что studentId корректен
           if (!students.any((s) => s.id == _lesson!.studentId)) {

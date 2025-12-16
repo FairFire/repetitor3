@@ -50,6 +50,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
             return Center(child: Text('Ошибка: ${snapshot.error}'));
           }
           final students = snapshot.data!;
+          students.sort((a, b) => a.fullName.compareTo(b.fullName));
           return students.isEmpty
               ? const Center(
                   child: Column(
