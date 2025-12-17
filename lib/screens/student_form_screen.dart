@@ -58,7 +58,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
           ? '-'
           : _phone2Controller.text.trim();
 
-      if (name.isEmpty || price <= 0) {
+      if (name.isEmpty || price < 0) {
         return;
       }
 
@@ -90,7 +90,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
-          widget.student == null ? 'Новый студент' : 'Редактирование студента',
+          widget.student == null ? 'Новый ученик' : 'Редактирование ученика',
         ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -106,7 +106,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'ФИО студента',
+                  'ФИО ученика',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextFormField(
@@ -117,7 +117,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Введите ФИО студента';
+                      return 'Введите ФИО ученика';
                     }
                     return null;
                   },
@@ -132,7 +132,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     final num = int.tryParse(value ?? '');
-                    if (num == null || num <= 0) {
+                    if (num == null || num < 0) {
                       return 'Введите корректную цену занятия';
                     } else {
                       return null;

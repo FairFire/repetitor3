@@ -8,7 +8,7 @@ import '../models/student.dart';
 class DBHelper {
   static Database? _db;
   static const String _dbName = 'tutor_app.db';
-  static const int _version = 1; // увеличена версия для обновления схемы
+  static const int _version = 2; // увеличена версия для обновления схемы
 
   // Получить экземпляр базы данных
   Future<Database> get db async {
@@ -46,6 +46,7 @@ class DBHelper {
             duration REAL NOT NULL,
             amount REAL NOT NULL,
             isCompleted INTEGER NOT NULL DEFAULT 0,
+            comment TEXT,
             FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
           )
         ''');
@@ -59,6 +60,11 @@ class DBHelper {
             FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE lessons ADD COLUMN comment TEXT');
+        }
       },
     );
   }

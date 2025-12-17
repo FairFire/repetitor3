@@ -5,6 +5,7 @@ class Lesson {
   double duration; // 1 или 2 часа
   double amount; // сумма на момент урока (фиксированная)
   bool isCompleted;
+  String? comment;
 
   Lesson({
     this.id,
@@ -13,6 +14,7 @@ class Lesson {
     required this.duration,
     required this.amount,
     this.isCompleted = false,
+    this.comment,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class Lesson {
       'duration': duration,
       'amount': amount,
       'isCompleted': isCompleted ? 1 : 0,
+      'comment': comment,
     };
   }
 
@@ -34,6 +37,7 @@ class Lesson {
       duration: (map['duration'] as num).toDouble(),
       amount: (map['amount'] as num).toDouble(),
       isCompleted: (map['isCompleted'] as int?) == 1,
+      comment: map['comment'],
     );
   }
 }

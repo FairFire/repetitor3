@@ -28,13 +28,19 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
   final DateFormat _dateFormatter = DateFormat('dd.MM.yyyy');
   final DateFormat _timeFormatter = DateFormat('HH:mm');
   bool _isAmountManuallySet = false;
+  late TextEditingController _amountController;
+  late TextEditingController _commentController;
 
   @override
   void initState() {
     super.initState();
     _studentsFuture = dbHelper.getStudents();
+    _amountController = TextEditingController();
+    _commentController = TextEditingController();
     if (widget.initialLesson != null) {
       _lesson = widget.initialLesson;
+      _amountController.text = _lesson!.amount.toStringAsFixed(0);
+      _commentController.text = _lesson!.comment ?? '';
     } else if (widget.lessonId != null) {
       dbHelper
           .getLessonById(widget.lessonId!)
@@ -42,6 +48,8 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
             if (lesson != null) {
               setState(() {
                 _lesson = lesson;
+                _amountController.text = lesson.amount.toStringAsFixed(0);
+                _commentController.text = lesson.comment ?? '';
               });
             } else {
               if (context.mounted) {
@@ -66,6 +74,12 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
         Navigator.pop(context);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   @override
@@ -136,15 +150,20 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                       final newStudent = students.firstWhere(
                         (s) => s.id == val,
                       );
+                      final newAmount = newStudent.price * _lesson!.duration;
                       setState(() {
                         _lesson = Lesson(
                           id: _lesson!.id,
                           studentId: val,
                           dateTime: _lesson!.dateTime,
                           duration: _lesson!.duration,
-                          amount:
-                              newStudent.price * _lesson!.duration.toDouble(),
+                          amount: _isAmountManuallySet
+                              ? _lesson!.amount
+                              : newAmount,
                         );
+                        if (!_isAmountManuallySet) {
+                          _amountController.text = newAmount.toStringAsFixed(0);
+                        }
                       });
                     }
                   },
@@ -237,14 +256,20 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                   ],
                   onChanged: (val) {
                     if (val != null) {
+                      final newAmount = currentStudent.price * val;
                       setState(() {
                         _lesson = Lesson(
                           id: _lesson!.id,
                           studentId: _lesson!.studentId,
                           dateTime: _lesson!.dateTime,
                           duration: val,
-                          amount: currentStudent.price * val.toDouble(),
+                          amount: _isAmountManuallySet
+                              ? _lesson!.amount
+                              : newAmount,
                         );
+                        if (!_isAmountManuallySet) {
+                          _amountController.text = newAmount.toStringAsFixed(0);
+                        }
                       });
                     }
                   },
@@ -268,7 +293,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
-                        initialValue: _lesson!.amount.toStringAsFixed(0),
+                        controller: _amountController,
                         onChanged: (value) {
                           final parsed = double.tryParse(value);
                           if (parsed != null) {
@@ -291,15 +316,16 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                       tooltip: 'Вернуть автосумму',
                       onPressed: () {
                         setState(() {
+                          final newAmount =
+                              currentStudent.price * _lesson!.duration;
                           _lesson = Lesson(
                             id: _lesson!.id,
                             studentId: _lesson!.studentId,
                             dateTime: _lesson!.dateTime,
                             duration: _lesson!.duration,
-                            amount:
-                                currentStudent.price *
-                                _lesson!.duration.toDouble(),
+                            amount: newAmount,
                           );
+                          _amountController.text = newAmount.toStringAsFixed(0);
                           _isAmountManuallySet = false;
                         });
                       },
@@ -328,6 +354,30 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                       }
                     },
                   ),
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _commentController,
+                  decoration: const InputDecoration(
+                    labelText: 'Комментарий',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                  maxLines: 5,
+                  onChanged: (value) {
+                    setState(() {
+                      _lesson = Lesson(
+                        id: _lesson!.id,
+                        studentId: _lesson!.studentId,
+                        dateTime: _lesson!.dateTime,
+                        duration: _lesson!.duration,
+                        amount: _lesson!.amount,
+                        isCompleted: _lesson!.isCompleted,
+                        comment: value.isEmpty ? null : value,
+                      );
+                    });
+                  },
                 ),
 
                 const SizedBox(height: 32),
