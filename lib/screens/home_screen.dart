@@ -95,41 +95,50 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Lesson>>(
-        future: _lessonsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+      body: GestureDetector(
+        onHorizontalDragEnd: (DragEndDetails details) {
+          if (details.primaryVelocity! > 10) {
+            _prevWeek();
+          } else if (details.primaryVelocity! < -10) {
+            _nextWeek();
           }
-          if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
-          }
-          final lessons = snapshot.data ?? [];
-
-          if (lessons.isEmpty) {
-            return const Center(child: Text('Нет занятий на эту неделю'));
-          }
-          final groupedLessons = _groupLessonsByDay(lessons);
-
-          final List<DateTime> dayWithLesson = [];
-          for (int i = 0; i < 7; i++) {
-            final dayDate = _currentWeekStart.add(Duration(days: i));
-            if (groupedLessons.containsKey(dayDate)) {
-              dayWithLesson.add(dayDate);
-            }
-          }
-          return SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: dayWithLesson.map((dayDate) {
-                  final dayLessons = groupedLessons[dayDate]!;
-                  return _buildDayButton(context, dayDate, dayLessons);
-                }).toList(),
-              ),
-            ),
-          );
         },
+        child: FutureBuilder<List<Lesson>>(
+          future: _lessonsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Ошибка: ${snapshot.error}'));
+            }
+            final lessons = snapshot.data ?? [];
+
+            if (lessons.isEmpty) {
+              return const Center(child: Text('Нет занятий на эту неделю'));
+            }
+            final groupedLessons = _groupLessonsByDay(lessons);
+
+            final List<DateTime> dayWithLesson = [];
+            for (int i = 0; i < 7; i++) {
+              final dayDate = _currentWeekStart.add(Duration(days: i));
+              if (groupedLessons.containsKey(dayDate)) {
+                dayWithLesson.add(dayDate);
+              }
+            }
+            return SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: dayWithLesson.map((dayDate) {
+                    final dayLessons = groupedLessons[dayDate]!;
+                    return _buildDayButton(context, dayDate, dayLessons);
+                  }).toList(),
+                ),
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
