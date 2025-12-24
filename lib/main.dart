@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:repetitor/screens/setting_screen.dart';
 //import 'package:intl/date_symbol_data_file.dart' as file;
+import 'screens/archive_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/students_screen.dart';
 import 'screens/income_screen.dart';
@@ -47,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     StudentsScreen(),
+    ArchiveScreen(),
     IncomeScreen(),
     SettingScreen(),
   ];
@@ -67,8 +69,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: switch (_selectedIndex) {
           0 => const Text('Расписание'),
           1 => const Text('Студенты'),
-          2 => const Text('Доход за месяц'),
-          3 => const Text('Настройка'),
+          2 => const Text('Архив'),
+          3 => const Text('Доход за месяц'),
+          4 => const Text('Настройка'),
           _ => const Text('Репетитор'),
         },
       ),
@@ -94,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Студенты'),
+              title: const Text('Ученики'),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pop(context);
@@ -102,8 +105,8 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.monetization_on),
-              title: const Text('Доход'),
+              leading: const Icon(Icons.person),
+              title: const Text('Архив'),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pop(context);
@@ -111,12 +114,21 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Настройка'),
+              leading: const Icon(Icons.monetization_on),
+              title: const Text('Доход'),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pop(context);
                 _onItemTap(3);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Настройка'),
+              selected: _selectedIndex == 4,
+              onTap: () {
+                Navigator.pop(context);
+                _onItemTap(4);
               },
             ),
           ],
@@ -124,22 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       body: currentScreen,
-      /*  bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Расписание',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Студенты'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Доход',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onItemTap,
-      ),*/
     );
   }
 }

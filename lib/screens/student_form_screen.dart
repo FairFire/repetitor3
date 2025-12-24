@@ -23,6 +23,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
   final _dbHelper = DBHelper();
   static const List<String> _levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
   final DateFormat _dateFormatter = DateFormat('dd.MM.yyyy');
+  late bool _isActive;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
     _phone2Controller = TextEditingController(text: student?.phone2 ?? '');
     _startDate = student?.startDate ?? DateTime.now();
     _level = student?.level ?? 'A1';
+    _isActive = student?.isActive ?? true;
   }
 
   @override
@@ -70,6 +72,7 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
         level: _level,
         phone1: phone1,
         phone2: phone2,
+        isActive: _isActive,
       );
 
       if (widget.student == null) {
@@ -201,6 +204,17 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.phone,
+                ),
+                SizedBox(height: 16),
+                CheckboxListTile(
+                  title: const Text('Учащийся учится'),
+                  value: _isActive,
+                  onChanged: (value) {
+                    setState(() {
+                      _isActive = value!;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
                 ),
 
                 SizedBox(height: 16),

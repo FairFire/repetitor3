@@ -23,7 +23,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
   void _refreshStudents() {
     setState(() {
-      _studentsFuture = dbHelper.getStudents();
+      _studentsFuture = dbHelper.getActiveStudents();
     });
   }
 

@@ -8,7 +8,7 @@ import '../models/student.dart';
 class DBHelper {
   static Database? _db;
   static const String _dbName = 'tutor_app.db';
-  static const int _version = 2; // увеличена версия для обновления схемы
+  static const int _version = 3; // увеличена версия для обновления схемы
 
   // Получить экземпляр базы данных
   Future<Database> get db async {
@@ -34,7 +34,8 @@ class DBHelper {
             startDate INTEGER NOT NULL,
             level TEXT NOT NULL,
             phone1 TEXT,
-            phone2 TEXT
+            phone2 TEXT,
+            isActive INTEGER NOT NULL DEFAULT 1
           )
         ''');
 
@@ -62,8 +63,10 @@ class DBHelper {
         ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute('ALTER TABLE lessons ADD COLUMN comment TEXT');
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE students ADD COLUMN isActive INTEGER NOT NULL DEFAULT 1',
+          );
         }
       },
     );
@@ -99,6 +102,18 @@ class DBHelper {
     final maps = await db.query('students', where: 'id = ?', whereArgs: [id]);
     if (maps.isEmpty) return null;
     return Student.fromMap(maps.first);
+  }
+
+  Future<List<Student>> getActiveStudents() async {
+    final db = await this.db;
+    final maps = await db.query('students', where: 'isActive = 1');
+    return List.generate(maps.length, (i) => Student.fromMap(maps[i]));
+  }
+
+  Future<List<Student>> getArchivedStudents() async {
+    final db = await this.db;
+    final maps = await db.query('students', where: 'isActive = 0');
+    return List.generate(maps.length, (i) => Student.fromMap(maps[i]));
   }
 
   // УРОКИ
