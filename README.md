@@ -58,5 +58,5 @@
 1. Установите [Flutter SDK](https://flutter.dev/docs/get-started/install)
 2. Клонируйте репозиторий:
    ```bash
-   git clone <ваш-репозиторий>
+   git clone https://github.com/FairFire/repetitor3.git
    cd repetitor
