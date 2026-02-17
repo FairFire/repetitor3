@@ -4,6 +4,7 @@ import 'package:repetitor/database/db_helper.dart';
 import 'package:repetitor/models/lesson.dart';
 import 'package:repetitor/models/student.dart';
 import 'package:repetitor/screens/lesson_detail_screen.dart';
+import 'package:repetitor/screens/student_form_screen.dart';
 
 class DayScheduleScreen extends StatefulWidget {
   final DateTime date;
@@ -87,6 +88,19 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
     }
   }
 
+  Future<void> _openStudentCard(Lesson lesson) async {
+    int idStudent = lesson.studentId;
+    Student? student = await dbHelper.getStudentById(idStudent);
+    if (student != null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StudentFormScreen(student: student),
+        ),
+      );
+    }
+  }
+
   Future<void> _deleteLesson(Lesson lesson) async {
     final confirm =
         await showDialog<bool>(
@@ -114,7 +128,7 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Урок удален')));
       Navigator.pop(context, true);
-    }
+    } else {}
   }
 
   @override
@@ -123,80 +137,105 @@ class _DayScheduleScreenState extends State<DayScheduleScreen> {
       'EEEE, dd.MM.yyyy',
       'ru',
     ).format(widget.date);
+    final fullDayNamee =
+        fullDayName[0].toUpperCase() + fullDayName.substring(1);
     return Scaffold(
+      backgroundColor: Colors.yellow.shade200,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(fullDayName),
+        backgroundColor: Colors.yellow.shade200,
+        title: Text(
+          fullDayNamee,
+          style: TextStyle(
+            color: Colors.deepPurple,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.deepPurple),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _lessons.isEmpty
           ? const Center(child: Text('Нет занятий'))
-          : ListView.builder(
-              itemCount: _lessons.length,
-              itemBuilder: (context, index) {
-                final lesson = _lessons[index];
-                return FutureBuilder<Student?>(
-                  future: dbHelper.getStudentById(lesson.studentId),
-                  builder: (context, snapshot) {
-                    final studentName = snapshot.hasData
-                        ? snapshot.data!.fullName
-                        : 'Студент без имени';
-                    final time = DateFormat('HH:mm').format(lesson.dateTime);
-                    return Dismissible(
-                      key: Key(lesson.id.toString()),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: const Icon(Icons.delete, color: Colors.black),
-                      ),
-                      onDismissed: (_) async {
-                        await dbHelper.deleteLesson(lesson.id!);
+          : SafeArea(
+              child: ListView.builder(
+                itemCount: _lessons.length,
+                itemBuilder: (context, index) {
+                  final lesson = _lessons[index];
+                  return FutureBuilder<Student?>(
+                    future: dbHelper.getStudentById(lesson.studentId),
+                    builder: (context, snapshot) {
+                      final studentName = snapshot.hasData
+                          ? snapshot.data!.fullName
+                          : 'Студент без имени';
+                      final time = DateFormat('HH:mm').format(lesson.dateTime);
+                      return Dismissible(
+                        key: Key(lesson.id.toString()),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: const Icon(Icons.delete, color: Colors.black),
+                        ),
+                        onDismissed: (_) => _deleteLesson(lesson),
+                        child: ListTile(
+                          title: Text(
+                            studentName,
+                            style: TextStyle(
+                              color: Colors.deepPurple,
+                              fontSize: 16,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${time} - ${_formatDuration(lesson.duration)}',
+                            style: TextStyle(
+                              color: Colors.deepPurple,
+                              fontSize: 16,
+                            ),
+                          ),
+                          trailing: Checkbox(
+                            side: BorderSide(
+                              color: Colors.deepPurple,
+                              width: 2,
+                            ),
+                            checkColor: Colors.yellow,
+                            hoverColor: Colors.deepPurple,
+                            focusColor: Colors.deepPurple,
+                            activeColor: Colors.deepPurple,
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: const Text('Урок удален')),
-                        );
-                        Navigator.pop(context, true);
-                      },
-                      child: ListTile(
-                        title: Text(studentName),
-                        subtitle: Text(
-                          '${time} - ${_formatDuration(lesson.duration)}',
+                            value: lesson.isCompleted,
+                            onChanged: (value) async {
+                              if (value != null) {
+                                final updateLesson = Lesson(
+                                  id: lesson.id,
+                                  studentId: lesson.studentId,
+                                  dateTime: lesson.dateTime,
+                                  duration: lesson.duration,
+                                  isCompleted: value,
+                                  amount: lesson.amount,
+                                );
+                                await dbHelper.updateLesson(updateLesson);
+                                setState(() {
+                                  _lessons[index] = updateLesson;
+                                });
+                              }
+                            },
+                          ),
+                          onTap: () => _editLesson(lesson),
+                          onLongPress: () => _openStudentCard(lesson),
                         ),
-                        trailing: Checkbox(
-                          value: lesson.isCompleted,
-                          onChanged: (value) async {
-                            if (value != null) {
-                              final updateLesson = Lesson(
-                                id: lesson.id,
-                                studentId: lesson.studentId,
-                                dateTime: lesson.dateTime,
-                                duration: lesson.duration,
-                                isCompleted: value,
-                                amount: lesson.amount,
-                              );
-                              await dbHelper.updateLesson(updateLesson);
-                              setState(() {
-                                _lessons[index] = updateLesson;
-                              });
-                            }
-                          },
-                        ),
-                        onTap: () => _editLesson(lesson),
-                        onLongPress: () => _deleteLesson(lesson),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.yellow.shade200,
         onPressed: _addLesson,
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, size: 40, color: Colors.deepPurple),
       ),
     );
   }

@@ -30,53 +30,55 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       //appBar: AppBar(title: const Text('Архив учеников')),
-      body: FutureBuilder(
-        future: _archivedStudentsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
-          }
-          final students = snapshot.data!;
-          students.sort((a, b) => a.fullName.compareTo(b.fullName));
-          return students.isEmpty
-              ? const Center(child: Text('Архив пуст'))
-              : ListView.builder(
-                  itemCount: students.length,
-                  itemBuilder: (context, index) {
-                    final student = students[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: ListTile(
-                        title: Text(student.fullName),
-                        subtitle: Text('${student.price} ₽/час'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.restore),
-                          onPressed: () async {
-                            final update = student.copyWith(isActive: true);
-                            await dbHelper.updateStudent(update);
-                            _refresh();
+      body: SafeArea(
+        child: FutureBuilder(
+          future: _archivedStudentsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Ошибка: ${snapshot.error}'));
+            }
+            final students = snapshot.data!;
+            students.sort((a, b) => a.fullName.compareTo(b.fullName));
+            return students.isEmpty
+                ? const Center(child: Text('Архив пуст'))
+                : ListView.builder(
+                    itemCount: students.length,
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: ListTile(
+                          title: Text(student.fullName),
+                          subtitle: Text('${student.price} ₽/час'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.restore),
+                            onPressed: () async {
+                              final update = student.copyWith(isActive: true);
+                              await dbHelper.updateStudent(update);
+                              _refresh();
+                            },
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    StudentFormScreen(student: student),
+                              ),
+                            ).then((_) => _refresh());
                           },
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  StudentFormScreen(student: student),
-                            ),
-                          ).then((_) => _refresh());
-                        },
-                      ),
-                    );
-                  },
-                );
-        },
+                      );
+                    },
+                  );
+          },
+        ),
       ),
     );
   }

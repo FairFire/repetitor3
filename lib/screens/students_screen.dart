@@ -40,71 +40,73 @@ class _StudentsScreenState extends State<StudentsScreen> {
         ),
       ),*/
       resizeToAvoidBottomInset: true,
-      body: FutureBuilder(
-        future: _studentsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
-          }
-          final students = snapshot.data!;
-          students.sort((a, b) => a.fullName.compareTo(b.fullName));
-          return students.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.person_off, size: 64, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        'Студенты не найдены',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: students.length,
-                  itemBuilder: (context, index) {
-                    final student = students[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: ListTile(
-                        trailing: IconButton(
-                          icon: const Icon(Icons.comment),
-                          onPressed: () {
+      body: SafeArea(
+        child: FutureBuilder(
+          future: _studentsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Ошибка: ${snapshot.error}'));
+            }
+            final students = snapshot.data!;
+            students.sort((a, b) => a.fullName.compareTo(b.fullName));
+            return students.isEmpty
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person_off, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'Студенты не найдены',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: students.length,
+                    itemBuilder: (context, index) {
+                      final student = students[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: ListTile(
+                          trailing: IconButton(
+                            icon: const Icon(Icons.comment),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StudentCommentsScreen(
+                                    studentId: student.id!,
+                                    studentName: student.fullName,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          title: Text(student.fullName),
+                          subtitle: Text('${student.price} ₽/час'),
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => StudentCommentsScreen(
-                                  studentId: student.id!,
-                                  studentName: student.fullName,
-                                ),
+                                builder: (context) =>
+                                    StudentFormScreen(student: student),
                               ),
-                            );
+                            ).then((_) => _refreshStudents());
                           },
                         ),
-                        title: Text(student.fullName),
-                        subtitle: Text('${student.price} ₽/час'),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  StudentFormScreen(student: student),
-                            ),
-                          ).then((_) => _refreshStudents());
-                        },
-                      ),
-                    );
-                  },
-                );
-        },
+                      );
+                    },
+                  );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

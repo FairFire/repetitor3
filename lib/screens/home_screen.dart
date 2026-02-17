@@ -79,18 +79,24 @@ class _HomeScreenState extends State<HomeScreen> {
     final weekEnd = _currentWeekStart.add(const Duration(days: 6));
 
     return Scaffold(
+      backgroundColor: Colors.deepPurple,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.yellow.shade200),
           onPressed: _prevWeek,
         ),
         title: Text(
           '${formatter.format(_currentWeekStart)} – ${formatter.format(weekEnd)}',
+          style: TextStyle(
+            color: Colors.yellow.shade200,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_forward),
+            icon: Icon(Icons.arrow_forward, color: Colors.yellow.shade200),
             onPressed: _nextWeek,
           ),
         ],
@@ -103,44 +109,53 @@ class _HomeScreenState extends State<HomeScreen> {
             _nextWeek();
           }
         },
-        child: FutureBuilder<List<Lesson>>(
-          future: _lessonsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Ошибка: ${snapshot.error}'));
-            }
-            final lessons = snapshot.data ?? [];
-
-            if (lessons.isEmpty) {
-              return const Center(child: Text('Нет занятий на эту неделю'));
-            }
-            final groupedLessons = _groupLessonsByDay(lessons);
-
-            final List<DateTime> dayWithLesson = [];
-            for (int i = 0; i < 7; i++) {
-              final dayDate = _currentWeekStart.add(Duration(days: i));
-              if (groupedLessons.containsKey(dayDate)) {
-                dayWithLesson.add(dayDate);
+        child: SafeArea(
+          child: FutureBuilder<List<Lesson>>(
+            future: _lessonsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                  color: Colors.deepPurple,
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
-            }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: dayWithLesson.map((dayDate) {
-                    final dayLessons = groupedLessons[dayDate]!;
-                    return _buildDayButton(context, dayDate, dayLessons);
-                  }).toList(),
+              if (snapshot.hasError) {
+                return Center(child: Text('Ошибка: ${snapshot.error}'));
+              }
+              final lessons = snapshot.data ?? [];
+
+              if (lessons.isEmpty) {
+                return Container(
+                  color: Colors.deepPurple,
+                  child: Center(child: Text('Нет занятий на эту неделю')),
+                );
+              }
+              final groupedLessons = _groupLessonsByDay(lessons);
+
+              final List<DateTime> dayWithLesson = [];
+              for (int i = 0; i < 7; i++) {
+                final dayDate = _currentWeekStart.add(Duration(days: i));
+                if (groupedLessons.containsKey(dayDate)) {
+                  dayWithLesson.add(dayDate);
+                }
+              }
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: dayWithLesson.map((dayDate) {
+                      final dayLessons = groupedLessons[dayDate]!;
+                      return _buildDayButton(context, dayDate, dayLessons);
+                    }).toList(),
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.yellow.shade200,
         onPressed: () async {
           final students = await dbHelper.getStudents();
           if (students.isEmpty) {
@@ -173,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           }
         },
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, color: Colors.deepPurple, size: 40),
       ),
     );
   }
@@ -192,7 +207,9 @@ class _HomeScreenState extends State<HomeScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: lessons.isEmpty ? Colors.grey.shade200 : null,
+          backgroundColor: lessons.isEmpty
+              ? Colors.grey.shade200
+              : Colors.yellow.shade200,
         ),
         onPressed: lessons.isEmpty
             ? null
@@ -217,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  _shortDayFormat.format(dayDate).substring(0, 2),
+                  _changeUpper(_shortDayFormat.format(dayDate).substring(0, 2)),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -226,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 16),
                 Text(
                   DateFormat('dd.MM').format(dayDate),
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -261,5 +278,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String _changeUpper(String str) {
+    if (str.isEmpty) return '';
+    return str[0].toUpperCase() + str.substring(1);
   }
 }

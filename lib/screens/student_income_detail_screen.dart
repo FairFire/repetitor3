@@ -44,7 +44,7 @@ class StudentIncomeDetailScreen extends StatelessWidget {
               return Center(child: CircularProgressIndicator());
             }
             final student = snapshot.data;
-            final fullName = student?.fullName ?? 'Студент не найден';
+            final fullName = student?.fullName ?? 'Ученик не найден';
             return FutureBuilder<List<Lesson>>(
               future: dbHelper.getLessonsForStudentInMonth(studentId, month),
               builder: (context, lessonSnapshot) {
